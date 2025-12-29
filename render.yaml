@@ -1,0 +1,28 @@
+services:
+  # Backend Service (FastAPI)
+  - type: web
+    name: safecircle-backend
+    env: docker
+    rootDir: backend
+    plan: free
+    envVars:
+      - key: MONGO_URL
+        sync: false # You must add your MongoDB connection string in the Render Dashboard
+      - key: DB_NAME
+        value: safecircle
+      - key: CORS_ORIGINS
+        value: "*" # Allow all origins for simplicity, or lock down to frontend URL later
+
+  # Frontend Static Site (React)
+  - type: static
+    name: safecircle-frontend
+    env: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./build
+    envVars:
+      - key: REACT_APP_BACKEND_URL
+        fromService:
+          type: web
+          name: safecircle-backend
+          property: url

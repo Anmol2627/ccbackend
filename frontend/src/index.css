@@ -1,0 +1,279 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+@layer base {
+  :root {
+    /* Core Colors - HSL Format */
+    --background: 210 20% 98%;
+    --foreground: 200 100% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 200 100% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 100% 11%;
+    
+    /* Primary Teal */
+    --primary: 173 80% 40%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 173 70% 60%;
+    --primary-dark: 173 85% 30%;
+    
+    /* Secondary Cyan */
+    --secondary: 190 100% 38%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 190 90% 55%;
+    
+    /* Accent */
+    --accent: 173 70% 50%;
+    --accent-foreground: 0 0% 100%;
+    
+    /* Emergency Colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
+    --warning: 25 95% 53%;
+    --warning-foreground: 0 0% 100%;
+    
+    /* Silent/Special */
+    --silent: 258 90% 66%;
+    --silent-foreground: 0 0% 100%;
+    --trusted: 173 85% 45%;
+    --trusted-foreground: 0 0% 100%;
+    
+    /* Neutrals */
+    --muted: 210 20% 96%;
+    --muted-foreground: 200 15% 45%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 173 80% 40%;
+    
+    /* Badge Levels */
+    --badge-gray: 0 0% 60%;
+    --badge-green: 160 84% 39%;
+    --badge-blue: 215 100% 50%;
+    --badge-purple: 258 90% 66%;
+    --badge-gold: 45 100% 50%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(173 80% 40%), hsl(190 100% 38%));
+    --gradient-emergency: linear-gradient(135deg, hsl(0 84% 60%), hsl(15 95% 55%));
+    --gradient-success: linear-gradient(135deg, hsl(160 84% 39%), hsl(140 70% 45%));
+    --gradient-badge-gold: linear-gradient(135deg, hsl(45 100% 50%), hsl(40 100% 60%));
+    --gradient-hero: linear-gradient(180deg, hsl(173 80% 40% / 0.05), hsl(190 100% 38% / 0.02));
+    
+    /* Shadows */
+    --shadow-soft: 0 2px 8px -2px hsl(173 80% 40% / 0.1);
+    --shadow-medium: 0 4px 16px -4px hsl(173 80% 40% / 0.15);
+    --shadow-strong: 0 8px 32px -8px hsl(173 80% 40% / 0.25);
+    --shadow-emergency: 0 0 40px hsl(0 84% 60% / 0.3);
+    --shadow-glow: 0 0 20px hsl(173 80% 40% / 0.4);
+    
+    /* Animations */
+    --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    --radius: 0.75rem;
+  }
+  
+  .dark {
+    --background: 200 25% 8%;
+    --foreground: 0 0% 98%;
+    --card: 200 20% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 200 20% 10%;
+    --popover-foreground: 0 0% 98%;
+    
+    --primary: 173 70% 50%;
+    --primary-foreground: 200 100% 11%;
+    --primary-light: 173 60% 65%;
+    --primary-dark: 173 80% 35%;
+    
+    --secondary: 190 90% 45%;
+    --secondary-foreground: 200 100% 11%;
+    
+    --accent: 173 60% 55%;
+    --accent-foreground: 200 100% 11%;
+    
+    --muted: 200 20% 15%;
+    --muted-foreground: 200 10% 60%;
+    --border: 200 15% 20%;
+    --input: 200 15% 20%;
+    --ring: 173 70% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  /* SOS Button Pulse Animation */
+  @keyframes sos-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 hsl(0 84% 60% / 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 30px hsl(0 84% 60% / 0);
+    }
+  }
+  
+  .sos-pulse {
+    animation: sos-pulse 2s infinite;
+  }
+  
+  /* Badge Unlock Animation */
+  @keyframes badge-unlock {
+    0% {
+      transform: scale(0) rotate(-180deg);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.2) rotate(10deg);
+    }
+    100% {
+      transform: scale(1) rotate(0);
+      opacity: 1;
+    }
+  }
+  
+  .badge-unlock {
+    animation: badge-unlock 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  /* Map Marker Pulse */
+  @keyframes marker-pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+  }
+  
+  .marker-pulse {
+    animation: marker-pulse 1.5s infinite;
+  }
+  
+  /* Gradient Text */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Glass Effect */
+  .glass-effect {
+    background: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  /* Smooth Transitions */
+  .transition-smooth {
+    transition: all var(--transition-smooth);
+  }
+  
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary));
+    border-radius: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary-dark));
+  }
+}
+
+@layer utilities {
+  /* Shadow utilities */
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .shadow-medium {
+    box-shadow: var(--shadow-medium);
+  }
+  
+  .shadow-strong {
+    box-shadow: var(--shadow-strong);
+  }
+  
+  .shadow-emergency {
+    box-shadow: var(--shadow-emergency);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+}
+
+@layer base {
+  [data-debug-wrapper="true"] {
+    display: contents !important;
+  }
+
+  [data-debug-wrapper="true"] > * {
+    margin-left: inherit;
+    margin-right: inherit;
+    margin-top: inherit;
+    margin-bottom: inherit;
+    padding-left: inherit;
+    padding-right: inherit;
+    padding-top: inherit;
+    padding-bottom: inherit;
+    column-gap: inherit;
+    row-gap: inherit;
+    gap: inherit;
+    border-left-width: inherit;
+    border-right-width: inherit;
+    border-top-width: inherit;
+    border-bottom-width: inherit;
+    border-left-style: inherit;
+    border-right-style: inherit;
+    border-top-style: inherit;
+    border-bottom-style: inherit;
+    border-left-color: inherit;
+    border-right-color: inherit;
+    border-top-color: inherit;
+    border-bottom-color: inherit;
+  }
+}
