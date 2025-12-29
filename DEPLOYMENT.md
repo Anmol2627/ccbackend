@@ -2,67 +2,58 @@
 
 This guide explains how to deploy the SafeCircle project to the cloud.
 
-## Option 1: Render.com (Easiest & Free)
+## 🏆 Recommended: Hybrid Deployment (Best for India)
 
-Render does **not** have a specific "India" region for free users (closest is Singapore), but it is the easiest way to get started.
+**Frontend** on **Vercel** (Fastest CDN in India) + **Backend** on **Render** (Easy Docker Hosting).
 
-1. **Sign up/Login** to [Render.com](https://render.com).
-2. **Connect GitHub**: Link your GitHub account.
-3. **Create Blueprint**:
-   - Click **"New"** -> **"Blueprint"**.
-   - Connect the repository `Anmol2627/ccbackend`.
-4. **Configure**:
-   - Enter `MONGO_URL` when prompted.
-   - Region: Select **Singapore** (closest to India).
-5. **Deploy**: Render handles everything.
+### Part 1: Deploy Backend on Render
+1.  **Sign up/Login** to [Render.com](https://render.com).
+2.  Click **New +** -> **Web Service**.
+3.  Connect your GitHub repository (`Anmol2627/ccbackend`).
+4.  **Settings**:
+    *   **Name**: `safecircle-backend`
+    *   **Region**: Singapore (closest to India).
+    *   **Runtime**: Docker.
+    *   **Root Directory**: `backend` (Important!).
+    *   **Instance Type**: Free.
+5.  **Environment Variables**:
+    *   `MONGO_URL`: Your MongoDB Atlas connection string.
+    *   `DB_NAME`: `safecircle`
+    *   `CORS_ORIGINS`: `*` (or your Vercel URL later).
+6.  **Deploy**.
+7.  **Copy URL**: Once live, copy your backend URL (e.g., `https://safecircle-backend.onrender.com`).
+
+### Part 2: Deploy Frontend on Vercel
+1.  **Sign up/Login** to [Vercel.com](https://vercel.com).
+2.  **Add New Project** -> Import `Anmol2627/ccbackend`.
+3.  **Configure**:
+    *   **Root Directory**: Click "Edit" -> Select `frontend`.
+    *   **Environment Variables**:
+        *   Key: `REACT_APP_BACKEND_URL`
+        *   Value: Your Render Backend URL (from Part 1).
+4.  **Deploy**.
+5.  **Done!** Your app is live globally with high performance in India.
 
 ---
 
-## Option 2: AWS EC2 (Best for India Location + Free Tier)
+## Alternative: AWS EC2 (Mumbai - Free Tier)
 
-If you strictly need an **India (Mumbai)** server, AWS offers a **Free Tier** for 12 months.
+If you strictly need an **India (Mumbai)** server for the backend, AWS offers a **Free Tier**.
 
 ### Step 1: Create EC2 Instance
-1.  Login to **AWS Console** and switch region to **Mumbai (ap-south-1)**.
-2.  Launch Instance:
-    *   **Name**: SafeCircle
-    *   **OS**: Ubuntu 22.04 LTS
-    *   **Instance Type**: `t2.micro` (Free Tier eligible)
-    *   **Key Pair**: Create new (download the `.pem` file).
-    *   **Security Group**: Allow SSH (22), HTTP (80), Custom TCP (3000), Custom TCP (8000).
-3.  Launch.
+1.  Login to **AWS Console** -> Region **Mumbai**.
+2.  Launch **Ubuntu 22.04**, Type **t2.micro**.
+3.  Security Group: Open ports 22, 80, 3000, 8000.
 
 ### Step 2: Run Setup Script
-1.  Connect to your instance via SSH:
-    ```bash
-    ssh -i "your-key.pem" ubuntu@your-ec2-public-ip
-    ```
-2.  Run the automated setup script:
-    ```bash
-    # Download the script
-    curl -o setup.sh https://raw.githubusercontent.com/Anmol2627/ccbackend/main/scripts/setup-vps.sh
-    
-    # Make it executable
-    chmod +x setup.sh
-    
-    # Run it
-    ./setup.sh
-    ```
-3.  Enter your `MONGO_URL` when prompted.
-4.  Your app will be live at `http://<your-ec2-ip>:3000`.
-
----
-
-## Option 3: DigitalOcean (Bangalore Region - Paid)
-
-If you want an easier setup than AWS but in India:
-1.  Create a **Droplet** in **Bangalore**.
-2.  Select "Docker" from the Marketplace images.
-3.  SSH into the server and run the same commands as Option 2.
+SSH into your instance and run:
+```bash
+curl -o setup.sh https://raw.githubusercontent.com/Anmol2627/ccbackend/main/scripts/setup-vps.sh && chmod +x setup.sh && ./setup.sh
+```
 
 ---
 
 ## Troubleshooting
 
-- **Backend Connection**: If the frontend says it cannot connect to the backend, check the `REACT_APP_BACKEND_URL` environment variable.
-- **MongoDB Error**: Ensure your IP whitelist in MongoDB Atlas allows access from anywhere (`0.0.0.0/0`) or specifically from your server's IP.
+- **Frontend can't connect**: Check `REACT_APP_BACKEND_URL` in Vercel settings. It must allow HTTPS (e.g. `https://your-render-app.onrender.com`).
+- **MongoDB Error**: Whitelist `0.0.0.0/0` in MongoDB Atlas Network Access.
