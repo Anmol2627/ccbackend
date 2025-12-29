@@ -2,82 +2,67 @@
 
 This guide explains how to deploy the SafeCircle project to the cloud.
 
-## Option 1: Render.com (Easiest All-in-One)
+## Option 1: Render.com (Easiest & Free)
 
-We recommend using **Render.com** because it supports both our backend (Docker) and frontend (Static Site) easily.
-
-### Prerequisites
-1. **GitHub Account**: Push this code to a new GitHub repository.
-2. **MongoDB Atlas Account**: Create a free database at [mongodb.com/atlas](https://www.mongodb.com/atlas).
-   - Create a Cluster (Free Tier).
-   - Create a Database User (username/password).
-   - Network Access: Allow IP `0.0.0.0/0` (for cloud access).
-   - Get your **Connection String** (e.g., `mongodb+srv://user:pass@cluster...`).
-
-### Steps to Deploy on Render
+Render does **not** have a specific "India" region for free users (closest is Singapore), but it is the easiest way to get started.
 
 1. **Sign up/Login** to [Render.com](https://render.com).
 2. **Connect GitHub**: Link your GitHub account.
 3. **Create Blueprint**:
    - Click **"New"** -> **"Blueprint"**.
-   - Connect the repository you just pushed.
-   - Render will automatically detect the `render.yaml` file in this project.
-4. **Configure Environment**:
-   - You will be prompted to enter the `MONGO_URL`. Paste your MongoDB Atlas connection string here.
-   - Click **"Apply"**.
-5. **Wait for Deployment**:
-   - Render will build the Backend (Docker) and Frontend (Node.js).
-   - Once finished, you will get two URLs: one for the backend, one for the frontend.
+   - Connect the repository `Anmol2627/ccbackend`.
+4. **Configure**:
+   - Enter `MONGO_URL` when prompted.
+   - Region: Select **Singapore** (closest to India).
+5. **Deploy**: Render handles everything.
 
 ---
 
-## Option 2: Vercel + Koyeb (Free Tier Alternative)
+## Option 2: AWS EC2 (Best for India Location + Free Tier)
 
-If you have issues with Render or want better performance in Asia (India), you can split the deployment:
+If you strictly need an **India (Mumbai)** server, AWS offers a **Free Tier** for 12 months.
 
-### Frontend (Vercel)
-1. **Login to [Vercel](https://vercel.com)** with GitHub.
-2. **Add New Project**: Import your `ccbackend` repository.
-3. **Configure Project**:
-   - **Root Directory**: Click "Edit" and select `frontend`.
-   - **Framework Preset**: Create React App.
-   - **Environment Variables**: Add `REACT_APP_BACKEND_URL` (You will get this from the Backend step below).
-4. **Deploy**: Click Deploy.
+### Step 1: Create EC2 Instance
+1.  Login to **AWS Console** and switch region to **Mumbai (ap-south-1)**.
+2.  Launch Instance:
+    *   **Name**: SafeCircle
+    *   **OS**: Ubuntu 22.04 LTS
+    *   **Instance Type**: `t2.micro` (Free Tier eligible)
+    *   **Key Pair**: Create new (download the `.pem` file).
+    *   **Security Group**: Allow SSH (22), HTTP (80), Custom TCP (3000), Custom TCP (8000).
+3.  Launch.
 
-### Backend (Koyeb)
-1. **Login to [Koyeb](https://koyeb.com)** with GitHub.
-2. **Create App**: Select "GitHub" as the source.
-3. **Repository**: Select `ccbackend`.
-4. **Builder**: Docker.
-5. **Docker Workdir**: Set this to `backend`.
-6. **Privileged**: No.
-7. **Environment Variables**:
-   - Add `MONGO_URL`: Your MongoDB connection string.
-   - Add `DB_NAME`: `safecircle`.
-   - Add `CORS_ORIGINS`: `*` (or your Vercel URL).
-8. **Deploy**.
-9. **Copy URL**: Once deployed, copy the `https://...koyeb.app` URL and update your Vercel Environment Variable (`REACT_APP_BACKEND_URL`).
+### Step 2: Run Setup Script
+1.  Connect to your instance via SSH:
+    ```bash
+    ssh -i "your-key.pem" ubuntu@your-ec2-public-ip
+    ```
+2.  Run the automated setup script:
+    ```bash
+    # Download the script
+    curl -o setup.sh https://raw.githubusercontent.com/Anmol2627/ccbackend/main/scripts/setup-vps.sh
+    
+    # Make it executable
+    chmod +x setup.sh
+    
+    # Run it
+    ./setup.sh
+    ```
+3.  Enter your `MONGO_URL` when prompted.
+4.  Your app will be live at `http://<your-ec2-ip>:3000`.
 
 ---
 
-## Option 3: Docker VPS (AWS EC2 / DigitalOcean)
+## Option 3: DigitalOcean (Bangalore Region - Paid)
 
-If you have a Linux server (e.g., AWS EC2 in Mumbai region) with Docker installed:
+If you want an easier setup than AWS but in India:
+1.  Create a **Droplet** in **Bangalore**.
+2.  Select "Docker" from the Marketplace images.
+3.  SSH into the server and run the same commands as Option 2.
 
-1. **Copy files** to your server (git clone or scp).
-2. **Update Environment**:
-   - Edit `docker-compose.yml` or create a `.env` file with your production values.
-3. **Run**:
-   ```bash
-   docker compose up -d --build
-   ```
-4. **Access**:
-   - Frontend: `http://<your-server-ip>:3000`
-   - Backend: `http://<your-server-ip>:8000`
-
-> **Note**: For production VPS, you should set up Nginx as a reverse proxy with SSL (Let's Encrypt).
+---
 
 ## Troubleshooting
 
-- **Backend Connection**: If the frontend says it cannot connect to the backend, check the `REACT_APP_BACKEND_URL` environment variable in the Frontend service. It should match your Backend Service URL.
-- **MongoDB Error**: Ensure your IP whitelist in MongoDB Atlas allows access from anywhere (`0.0.0.0/0`) or specifically from your cloud provider's IPs.
+- **Backend Connection**: If the frontend says it cannot connect to the backend, check the `REACT_APP_BACKEND_URL` environment variable.
+- **MongoDB Error**: Ensure your IP whitelist in MongoDB Atlas allows access from anywhere (`0.0.0.0/0`) or specifically from your server's IP.
