@@ -13,13 +13,12 @@ services:
       - key: CORS_ORIGINS
         value: "*" # Allow all origins for simplicity, or lock down to frontend URL later
 
+staticSites:
   # Frontend Static Site (React)
-  - type: static
-    name: safecircle-frontend
-    env: node
+  - name: safecircle-frontend
     rootDir: frontend
     buildCommand: npm install && npm run build
-    staticPublishPath: ./build
+    publishPath: ./build
     envVars:
       - key: REACT_APP_BACKEND_URL
         fromService:
